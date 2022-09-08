@@ -3,8 +3,6 @@ package routing
 import (
 	c "consoleshop/database/controllers"
 
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -49,14 +47,13 @@ func Init() *echo.Echo {
 	// Console With Quantity API
 	e.GET("/carts", c.GetCarts)
 	e.GET("/carts/:id", c.GetCart)
+	e.GET("/cartsUser", c.GetCartForUser)
 	e.POST("/carts", c.AddCart)
 	e.DELETE("/carts/:id", c.DeleteCart)
 	e.PUT("/carts/:id", c.UpdateCart)
 
 	// Payments
-	e.POST("/payments", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Payment done.")
-	})
+	e.POST("/payments", c.MakePayment)
 
 	return e
 }

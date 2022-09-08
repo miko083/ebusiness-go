@@ -57,7 +57,7 @@ func seed(db *gorm.DB) {
 	}
 
 	shippingCart := m.ShippingCart{
-		User: johnSmith, ConsolesWithQuantity: consolesWithQuantity,
+		User: johnSmith, ConsolesWithQuantity: consolesWithQuantity, PaymentDone: true,
 	}
 
 	db.Create(&shippingCart)

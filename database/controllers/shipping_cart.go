@@ -2,6 +2,7 @@ package controllers
 
 import (
 	m "consoleshop/database/models"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -25,6 +26,12 @@ func GetCart(c echo.Context) error {
 	return c.JSON(http.StatusOK, shippingCart)
 }
 
+func GetCartForUser(c echo.Context) error {
+	var shippingCart m.ShippingCart
+	database.DBconnection.Preload("ConsolesWithQuantity").Preload("ConsolesWithQuantity.Console").Preload("ConsolesWithQuantity.Console.Manufacturer").Find(&shippingCart, "payment_done = ?", false)
+	return c.JSON(http.StatusOK, shippingCart)
+}
+
 func AddCart(c echo.Context) error {
 	shippingCart := m.ShippingCart{}
 	err := c.Bind(&shippingCart)
@@ -32,6 +39,7 @@ func AddCart(c echo.Context) error {
 		log.Printf("Failed: %s", err)
 		return echo.NewHTTPError(http.StatusInternalServerError)
 	}
+	fmt.Println(shippingCart)
 	database.DBconnection.Create(&shippingCart)
 	return c.JSON(http.StatusOK, "Added new shipping cart.")
 }
@@ -64,4 +72,15 @@ func UpdateCart(c echo.Context) error {
 
 	database.DBconnection.Save(&shippingCartToUpdate)
 	return c.JSON(http.StatusOK, "Updated shipping cart with the id: "+id)
+}
+
+func MakePayment(c echo.Context) error {
+	var shippingCart m.ShippingCart
+	query := database.DBconnection.Preload("ConsolesWithQuantity").Preload("ConsolesWithQuantity.Console").Preload("ConsolesWithQuantity.Console.Manufacturer").Find(&shippingCart, "payment_done = ?", false)
+	if query.RowsAffected > 0 {
+		shippingCart.PaymentDone = true
+		database.DBconnection.Save(&shippingCart)
+		return c.JSON(http.StatusOK, "Done.")
+	}
+	return c.JSON(http.StatusBadRequest, "No shipping cart.")
 }

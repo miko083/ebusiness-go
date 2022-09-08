@@ -9,4 +9,5 @@ type ShippingCart struct {
 	UserID               int                   `json:"user_id"`
 	User                 User                  `json:"user"`
 	ConsolesWithQuantity []ConsoleWithQuantity `json:"consoles_with_quantity"`
+	PaymentDone          bool                  `json:"payment_done"`
 }
